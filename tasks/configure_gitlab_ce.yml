@@ -16,6 +16,9 @@
     dest: '{{ gitlab_ce_git_dest }}'
     bare: True
     update: True
+    depth: 1
+    #refspec: +refs/tags/*:refs/heads/*:refs/remotes/origin/*
+    #version: '{{ gitlab_version_map[gitlab_version].ce }}'
   sudo_user: '{{ gitlab_user }}'
   register: gitlab_register_ce_source
 
@@ -39,6 +42,13 @@
     owner: '{{ gitlab_user }}'
     group: '{{ gitlab_group }}'
     mode: '0644'
+
+- name: Fetch branch
+  shell: GIT_WORK_TREE={{ gitlab_ce_git_checkout }} git fetch -vv --update-head-ok --depth=1 origin {{ gitlab_version_map[gitlab_version].ce }}:{{ gitlab_version_map[gitlab_version].ce }}
+         chdir={{ gitlab_ce_git_dest }}
+  sudo_user: '{{ gitlab_user }}'
+  register: gitlab_register_ce_fetch_branch
+  changed_when: "'* [new branch]' in gitlab_register_ce_fetch_branch.stdout"
 
 - name: Get commit hash of target checkout
   shell: GIT_WORK_TREE={{ gitlab_ce_git_checkout }} git rev-parse {{ gitlab_version_map[gitlab_version].ce }}
