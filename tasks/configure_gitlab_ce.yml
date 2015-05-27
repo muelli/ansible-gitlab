@@ -219,6 +219,9 @@
           (ansible_local.gitlab.installed is undefined or (ansible_local.gitlab.installed is defined and
            not ansible_local.gitlab.installed))))))
 
+- debug: var=gitlab_admin_email
+- debug: var=gitlab_admin_password
+
 - name: Initialize GitLab database
   shell: yes 'yes' | bundle exec rake gitlab:setup RAILS_ENV=production
          chdir={{ gitlab_ce_git_checkout }}
